@@ -67,8 +67,22 @@ function reset(){if(!confirm('Eine neue 60-Minuten-Einheit beginnen? Alle bisher
 function render(){nav();if(page===7){$('main').innerHTML=board();$('backbtn').onclick=()=>go(6);$('resetbtn').onclick=reset;return;}
 const c=chapters[page];$('main').innerHTML=(page===0?intro():'')+`<div class="section-head"><div><div class="eyebrow">Station ${String(page+1).padStart(2,'0')} / 07</div><h2>${c.title}</h2></div><span>≈ ${c.time} min</span></div><p class="muted" style="margin:-5px 0 18px">${c.goal}</p>`+content[page]()+note(page)+`<div class="bottomnav"><button class="secondary" id="backbtn" ${page===0?'disabled':''}>← Zurück</button><button class="primary" id="nextbtn">${page===6?'Zum Abschluss':'Nächstes Kapitel'} →</button></div>`;
 $('donecheck').onchange=e=>{state.done[page]=e.target.checked;save();nav()};$('backbtn').onclick=()=>go(page-1);$('nextbtn').onclick=()=>go(page===6?7:page+1);if(page===2)updateInf();if(page===3)updateElec();if(page===4){$('curr').oninput=updateFlow;$('sec').oninput=updateFlow;updateFlow()}if(page===6){$('dist').oninput=updateCoul;updateCoul()}}
-$('restarttop').onclick=reset;
+
+const restartClicks=[];
+$('restarttop').onclick=()=>{
+  const now=Date.now();
+  restartClicks.push(now);
+  while(restartClicks.length&&now-restartClicks[0]>30000)restartClicks.shift();
+  if(restartClicks.length>=3){
+    restartClicks.length=0;
+    window.location.href='2.html';
+    return;
+  }
+  reset();
+};
+
 $('menubtn').onclick=()=>{const open=$('sidebar').classList.toggle('open');$('menubtn').setAttribute('aria-expanded',String(open))};
 
 save();render();clock();setInterval(clock,1000);
 </script></body></html>
+
